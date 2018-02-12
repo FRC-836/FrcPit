@@ -5,7 +5,8 @@
 //                     If button color is different, then color changes to button pressed.
 //          Yellow - When pressed, changes effect.
 // version 2018.01.31.01
-
+// version 2018.02.11.01 - updated default brightness to 220
+//
 #include <Adafruit_NeoPixel.h>
 // --------------------------------- Button and Pin definitions
 #define BUTTON_YELLOW 1
@@ -26,7 +27,7 @@ Adafruit_NeoPixel stripLeft    = Adafruit_NeoPixel(NUM_LEDS_RB, PIN_LEFT, NEO_GR
 Adafruit_NeoPixel stripRight   = Adafruit_NeoPixel(NUM_LEDS_RB, PIN_RIGHT, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel stripYellow  = Adafruit_NeoPixel(NUM_LEDS, PIN_YELLOW, NEO_GRB + NEO_KHZ800);
 
-int bright = 127;
+int bright = 220;
 int vbright = 255;
 int q = 0; //chaser variable used for every third pixel
 
@@ -54,12 +55,12 @@ int yellowEffectMax = 1;
 int buttonState;
 int lastButtonState = LOW;
 unsigned long lastDebounceTime = 0;
-unsigned long debounceDelay = 50;
+unsigned long debounceDelay = 150;
 int x = 0;    //temp variable for tracking how many times the yellow interrupt is called
 
 
 void setup() {
-  Serial.begin(9600);
+  //Serial.begin(9600);
   //initialize and clear each strip
   stripYellow.begin();
   stripYellow.show();
@@ -79,7 +80,7 @@ void setup() {
 
   attachInterrupt(digitalPinToInterrupt(BUTTON_RED), pinRed_ISR, CHANGE);
   attachInterrupt(digitalPinToInterrupt(BUTTON_BLUE), pinBlue_ISR, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(BUTTON_YELLOW), pinYellow_ISR, CHANGE);  
+  attachInterrupt(digitalPinToInterrupt(BUTTON_YELLOW), pinYellow_ISR, HIGH);  
 }
 
 void loop() {
@@ -139,42 +140,26 @@ void setPixelPosts(int Pixel, int red, int green, int blue) {
 
 // --------------------------------- Interrupts for button presses
 void pinYellow_ISR() {
-
-  
+ 
   int reading = digitalRead(BUTTON_YELLOW);
-  x = x + 1;
-  Serial.println(x);
-
-  // If the switch changed, due to noise or pressing:
-  if (reading != lastButtonState) {
-    // reset the debouncing timer
+  buttonState = reading;
+  if (buttonState == HIGH) {
+    x = x + 1;
+    //Serial.println(x);
     lastDebounceTime = millis();
-    //Serial.println("reset timer");
-  }
   
-  if ((millis()-lastDebounceTime) > debounceDelay) {
-    // whatever the reading is at, it's been there for longer than the debounce
-    // delay, so take it as the actual current state:
-    Serial.println("good read");
-    // if the button state has changed:
-    if (reading != buttonState) {
-      buttonState = reading;
-
-      if (buttonState == HIGH) {
-        Serial.println("Button HIGH");
-        //button pressed, increment to next function
-        currentYellowEffect +=1;
-        if (currentYellowEffect > yellowEffectMax) {
-          currentYellowEffect = 0;
-        }
-        Serial.println(currentYellowEffect);
+    do {
+      
+    } while ((digitalRead(BUTTON_YELLOW) == HIGH) && (millis()-lastDebounceTime > debounceDelay));
+    if (buttonState == digitalRead(BUTTON_YELLOW)) {
+      currentYellowEffect += 1;
+      if (currentYellowEffect > yellowEffectMax) {
+        currentYellowEffect = 0;
         x=0;
       }
+      //Serial.println(currentYellowEffect);
     }
-  } else {
-    Serial.println("not long enough");
   }
-  lastButtonState = reading;
 }
 
 void pinRed_ISR() {
