@@ -5,7 +5,8 @@
 //                     If button color is different, then color changes to button pressed.
 //          Yellow - When pressed, changes effect.
 // version 2018.01.31.01
-
+// version 2018.02.11.01 - updated default brightness to 220
+//
 #include <Adafruit_NeoPixel.h>
 // --------------------------------- Button and Pin definitions
 #define BUTTON_YELLOW 1
@@ -26,7 +27,7 @@ Adafruit_NeoPixel stripLeft    = Adafruit_NeoPixel(NUM_LEDS_RB, PIN_LEFT, NEO_GR
 Adafruit_NeoPixel stripRight   = Adafruit_NeoPixel(NUM_LEDS_RB, PIN_RIGHT, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel stripYellow  = Adafruit_NeoPixel(NUM_LEDS, PIN_YELLOW, NEO_GRB + NEO_KHZ800);
 
-int bright = 127;
+int bright = 220;
 int vbright = 255;
 int q = 0; //chaser variable used for every third pixel
 
